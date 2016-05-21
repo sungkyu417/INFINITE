@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+    <link rel="stylesheet" href="../public/styles/basic.css" />
+    <script src="../public/scripts/formValidate.js"></script>
+</head>
+<body>
+<div id="register">
+    <h1>Register</h1>
+    <form name="form" method="get">
+        <label for="name">Username:</label>
+        <input type="text" id="name" name="username"/><span id="warningName"></span><br/>
+        <label form="password">Password:</label>
+        <input type="password" id="password" name="password" /><span id="warningPass"></span><br/>
+        <label form="email">E-mail:</label>
+        <input type="text" id="email" name="email" /><span id="warningEmail"></span><br/>
+        <button type="submit" id="submit">Submit</button>
+        <button type="reset" id="reset">Reset</button>
+    </form>
+</div>
+</body>
+</html>

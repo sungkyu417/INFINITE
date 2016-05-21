@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>放大</title>
+    <style type="text/css">
+        *{padding: 0;margin: 0;font-size: 16px;}
+        .container,.container1{position: relative;width: 30rem;height: 16rem;display: flex;justify-content:around;margin: 4rem;}
+        .container1{width: 40rem;height: 24rem;}
+        .small-box,.small-box1{position: relative;width: 50%;height: 100%;}
+        .small-box img,.small-box1 img{width: 100%;height: 100%;}
+        img{display: block;}
+        .big-box,.big-box1{display: none;width: 50%;height: 100%;overflow: hidden;}
+        .move,.move1{display: none;position: absolute;background: #fff;cursor: crosshair;opacity:0.5;filter:alpha(opacity=50);z-index: 10;}
+        #a{width: 100px;height: 100px;background: red;}
+        #b{width: 200px;height: 200px;position: relative;}
+    </style>
+</head>
+<body>
+<section class="container">
+    <div class="small-box">
+        <span class="move"></span>
+        <img src="../public/images/1.jpg" />
+    </div>
+    <div class="big-box">
+        <img src="../public/images/1.jpg" class="img" />
+    </div>
+</section>
+<section class="container1">
+    <div class="small-box1">
+        <span class="move1"></span>
+        <img src="../public/images/2.jpg" />
+    </div>
+    <div class="big-box1">
+        <img src="../public/images/2.jpg" class="img1" />
+    </div>
+</section>
+<script type="text/javascript">
+    // console.log(document.querySelector('#a').offsetTop);//相对于已有定位的父容器（父容器都没有定位就是相对body的）
+    // 注意图片的大小一定要比显示框大才行
+    function Enlarge(smallBox , bigBox , move , img){
+        this.init(smallBox , bigBox , move , img);
+    }
+    Enlarge.prototype =  {
+        init: function(smallBox , bigBox , move , img) {
+            var that = this;
+            this.smallBox = smallBox ;
+            this.bigBox  = bigBox ;
+            this.move = move ;
+            this.img = img ;
+            this.scale1 = this.img.width / this.smallBox.offsetWidth;
+            this.scale2 = this.img.height / this.smallBox.offsetHeight;
+            this.move.style.width  = this.smallBox.offsetWidth / this.scale1 + 'px';
+            this.move.style.height = this.smallBox.offsetHeight / this.scale2 + 'px';
+            this.smallBox.onmousemove = function(event) {
+                that.goMove(event);
+            };
+            this.smallBox.onmouseout = function() {
+                that.move.style.display = 'none';
+                that.bigBox.style.display = 'none';
+            };
+        },
+        goMove : function(event) {
+            var event = window.event || event;
+            var x = event.clientX ;
+            var y = event.clientY ;
+            this.move.style.display = this.bigBox.style.display = 'block';
+            x = x - this.smallBox.getBoundingClientRect().left - this.move.offsetWidth/2;
+            y =  y - this.smallBox.getBoundingClientRect().top -  this.move.offsetHeight/2;
+            if( x < 0) {
+                x = 0;
+            } else if ( x > this.smallBox.offsetWidth - this.move.offsetWidth) {
+                x =  this.smallBox.offsetWidth - this.move.offsetWidth;
+            }
+            if ( y < 0 ) {
+                y = 0;
+            } else if ( y > this.smallBox.offsetHeight - this.move.offsetHeight) {
+                y = this.smallBox.offsetHeight - this.move.offsetHeight;
+            }
+            this.move.style.left = x + 'px';
+            this.move.style.top = y + 'px';
+            this.bigBox.scrollLeft = this.scale1 * x;
+            this.bigBox.scrollTop = this.scale2 * y;
+        }
+    };
+    // 调用
+    window.onload = function() {
+        var smallBox = document.querySelector('.small-box');
+        var bigBox = document.querySelector('.big-box');
+        var move = document.querySelector('.move');
+        var img = document.querySelector('.img');
+        new Enlarge(smallBox , bigBox ,move ,img);
+        var smallBox = document.querySelector('.small-box1');
+        var bigBox = document.querySelector('.big-box1');
+        var move = document.querySelector('.move1');
+        var img = document.querySelector('.img1');
+        new Enlarge(smallBox , bigBox ,move ,img);
+    };
+</script>
+</body>
+</html>

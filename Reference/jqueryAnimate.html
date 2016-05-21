@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>JQ Animate Override</title>
+</head>
+<body>
+<div id="output" style="height:100px;background-color:#fcfcfc;color:#000;border:solid 10px #f00;font-size:40px;font-weight:bold;border-right:solid 10px #690;">点我看效果</div>
+<script src="http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js"></script>
+<script>
+
+    $(function () {
+        // store the jq animate function temporarily
+        var _anim = $.fn.animate;
+        // override jq animate function
+        $.fn.extend({
+            animate: function (styles, speed, easing, callback) {
+                if (typeof styles == "object") {
+                    var colorStyles = null,
+                            that = this;
+                    for (var style in styles) {
+                        // init colorStyle object
+                        if (!colorStyles && /color/gi.exec(style)) colorStyles = {};
+                        // get the color styles
+                        if (style == "color") {
+                            colorStyles.color = styles[style];
+                        } else if (style == "background-color" || style == "backgroundColor") {
+                            colorStyles.backgroundColor = styles[style];
+                        } else if (style == "border-color" || style == "borderColor") {
+                            colorStyles.borderColor = styles[style];
+                        } else if (style == "border-top-color" || style == "borderTopColor") {
+                            colorStyles.borderTopColor = styles[style];
+                        } else if (style == "border-right-color" || style == "borderRightColor") {
+                            colorStyles.borderRightColor = styles[style];
+                        } else if (style == "border-bottom-color" || style == "borderBottomColor") {
+                            colorStyles.borderBottomColor = styles[style];
+                        } else if (style == "border-left-color" || style == "borderLeftColor") {
+                            colorStyles.borderLeftColor = styles[style];
+                        }
+                        delete styles[style];
+                    }
+                    // if check color styles positive
+                    if (colorStyles) {
+                        // color animation class
+                        function animColor() {
+                            // color animation function
+                            this.anim = function (colorStyle, targetStyleColor) {
+                                targetStyleColor = formatColor(targetStyleColor);
+                                var currentColor = formatColor($(that).get(0).style[colorStyle]),
+                                        step = calcStep(currentColor, targetStyleColor);
+                                console.log("currentColor: " + currentColor);
+                                changeColor(colorStyle, currentColor, targetStyleColor, step);
+                            };
+                            // color value step of animation
+                            function calcStep(startColor, endColor) {
+                                var maxDiff = -1, animStep = 1;
+                                for (var i = 0; i < 3; i++) {
+                                    if (Math.abs(endColor[i] - startColor[i]) > maxDiff) {
+                                        maxDiff = Math.abs(endColor[i] - startColor[i]);
+                                    }
+                                }
+                                animStep = Math.floor(maxDiff / (speed / 20));
+                                //console.log(maxDiff + "," + speed);
+                                animStep = !animStep ? 1 : animStep;
+                                return animStep;
+                            }
+                            // set the middle frame color of element
+                            function changeColor(colorStyle, middleStyle, toStyle, step) {
+                                middleStyle = changeColorStep(middleStyle, toStyle, step);
+                                $(that).get(0).style[colorStyle] = "rgb(" + middleStyle[0] + "," + middleStyle[1] + "," + middleStyle[2] + ")";
+                                if (middleStyle[0] == toStyle[0] && middleStyle[1] == toStyle[1] && middleStyle[2] == toStyle[2]) {
+                                    $(that).get(0).style[colorStyle] = hexColor(middleStyle);
+                                    return;
+                                }
+                                setTimeout(function () {
+                                    changeColor(colorStyle, middleStyle, toStyle, step);
+                                }, 20);
+                            }
+                            // calculate step color
+                            function changeColorStep(curClr, tgtClr, step) {
+                                for (var i = 0; i < 3; i++) {
+                                    if (curClr[i] < tgtClr[i]) {
+                                        curClr[i] += step;
+                                        if (curClr[i] > tgtClr[i]) curClr[i] = tgtClr[i];
+                                    } else if (curClr[i] > tgtClr[i]) {
+                                        curClr[i] -= step;
+                                        if (curClr[i] < tgtClr[i]) curClr[i] = tgtClr[i];
+                                    }
+                                }
+                                return curClr;
+                            }
+                            // convert hex color to rgb color
+                            function formatColor(styleColor) {
+                                if (!styleColor) {
+                                    return [0, 0, 0];
+                                } else {
+                                    var r = g = b = 0;
+                                    if (/^#[a-f0-9]{3}$/gi.exec(styleColor)) {
+                                        r = parseInt(styleColor.substr(1, 1) + styleColor.substr(1, 1), 16);
+                                        g = parseInt(styleColor.substr(2, 1) + styleColor.substr(2, 1), 16);
+                                        b = parseInt(styleColor.substr(3, 1) + styleColor.substr(3, 1), 16);
+                                    } else if (/^#[a-f0-9]{6}$/gi.exec(styleColor)) {
+                                        r = parseInt(styleColor.substr(1, 2), 16);
+                                        g = parseInt(styleColor.substr(3, 2), 16);
+                                        b = parseInt(styleColor.substr(5, 2), 16);
+                                    } else if (styleColor.toLowerCase().indexOf("rgb") != -1) {    // rgb
+                                        styleColor = styleColor.toLowerCase().split(/\(|\)/gi)[1].split(',');
+                                        r = styleColor[0].trim() * 1;
+                                        g = styleColor[1].trim() * 1;
+                                        b = styleColor[2].trim() * 1;
+                                    }
+                                    return [r, g, b];
+                                }
+                            }
+                            // convert rgb color to hex color
+                            function hexColor(rgb) {
+                                var r = ("0" + rgb[0].toString(16)).substr(-2),
+                                        g = ("0" + rgb[1].toString(16)).substr(-2),
+                                        b = ("0" + rgb[2].toString(16)).substr(-2);
+                                return "#" + r + g + b;
+                            }
+                        }
+
+                        // play color animation
+                        for (var styl in colorStyles) {
+                            var anim = new animColor();
+                            anim.anim(styl, colorStyles[styl]);
+                            anim = null;
+                        }
+                    }
+                }
+
+                // most important step: get the original function of jq animate
+                return _anim.apply(this, [styles, speed, easing, callback]);
+            }
+        });
+
+
+        // useage
+        $("#output").on("click",function(){
+
+            $("#output").animate({
+                "background-color": "#000",
+                color: "#f00",
+                "border-top-color": "#00aaff",
+                "border-right-color": "#0af",
+                height: "200px",
+                width: "300px"
+            }, 5000);
+
+        });
+
+
+    });
+</script>
+</body>
+</html>

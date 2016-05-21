@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz</title>
+    <style>
+        .thing{
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            border: 2px double;
+            background-color: white;
+            margin: 5px;
+            padding: 5px;
+        }
+    </style>
+    <script>
+        var facts=[
+                ["China","BeingJing",false],["America","New York",false],["England","London",false],["German","Berlin",false]
+        ];
+        var thinglem,nq= 4,elementinmotion,makingmove=false,inbetween=300,col1=20,row1=200,rowsize=50,slots=new Array(nq);
+        function init(){
+            setupgame();
+        }
+        function setupgame(){
+            var i, c, s,mx=col1,my=row1, d,uniqueid;
+            for(i=0;i<nq;i++){
+                facts[i][2]=false;
+            }
+            for(i=0;i<nq;i++){
+                slots[i]=-100;
+            }
+            for(i=0;i<nq;i++){
+                do{
+                    c=Math.floor(Math.random()*facts.length);
+                }while(facts[c][2]==true)
+                facts[c][2]=true;
+                uniqueid="c"+String(c);
+                d=document.createElement('country');
+                d.innerHTML=("<div class='thing' id='"+uniqueid+"'>placeholder</div>");
+                document.body.appendChild(d);
+                thinglem=document.getElementById(uniqueid);
+                thinglem.textContent=facts[c][0];
+                thinglem.style.top=String(my)+"px";
+                thinglem.style.left=String(mx)+"px";
+                thinglem.addEventListener('click',pickelement,false);
+                uniqueid="p"+String(c);
+                d=document.createElement('cap');
+                d.innerHTML=("<div class='thing' id='"+uniqueid+"'>placeholder</div>");
+                document.body.appendChild(d);
+                thinglem=document.getElementById(uniqueid);
+                thinglem.textContent=facts[c][1];
+                do{
+                    s=Math.floor(Math.random()*nq);
+                }while(slots[s]>=0)
+                slots[s]=c;
+                thinglem.style.top=String(row1+s*rowsize)+"px";
+                thinglem.style.left=String(col1+inbetween)+"px";
+                thinglem.addEventListener('click',pickelement,false);
+                my+=rowsize;
+            }
+            document.f.score.value="0";
+            return false;
+        }
+        function pickelement(ev){
+            var thisx,thisxn;
+            if(makingmove){
+                thisx=this.style.left;
+                thisx=thisx.substring(0,thisx.length-2);
+                thisxn=Number(thisx)+110;
+                elementinmotion.style.left=String(thisxn)+"px";
+                elementinmotion.style.top=this.style.top;
+                makingmove=false;
+                if(this.id.substring(1)==elementinmotion.id.substring(1)){
+                    elementinmotion.style.backgroundColor="gold";
+                    this.style.backgroundColor="gold";
+                    document.f.out.value="Right";
+                    document.f.score.value=String(1+Number(document.f.score.value));
+                }else {
+                    document.f.out.value="Wrong";
+                }
+            }else {
+                makingmove=true;
+                elementinmotion=this;
+            }
+        }
+    </script>
+</head>
+<body onload="init()">
+<h1>Countries and cities.</h1>
+<p>
+    Reload for new game.
+    <form name="f">
+    Action:<input name="out" type="text" value="Right or Wrong" />
+    Score:<input name="score" type="text" value="0" />
+</form>
+</p>
+</body>
+</html>
