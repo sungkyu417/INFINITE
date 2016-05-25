@@ -43,7 +43,7 @@
                 this.moveX = moveX,
                 this.moveY = moveY;
     }
-    //生成max和min之间的随机数
+    //生成max和min之间的随机数，若只有一个参数，min取0
     function num (max, _min) {
         var min = arguments[1] || 0;
         return Math.floor(Math.random()*(max-min+1)+min);

@@ -160,17 +160,29 @@ fieldset{
     border: 0;
 }
 #register,#logIn{
-    margin-left: 40%;
-    margin-right: 30%;
-   margin-top: 20%;
+   position: relative;
+    width: 400px;
+    left: 50%;
+    margin-left: -200px;
+    margin-top: 20%;
+    padding-left: 60px;
 }
+
 #register h1,#logIn h1{
 
-    margin-bottom: 50px;
+    margin-bottom: 30px;
 }
 #register input, #logIn input{
     margin-bottom: 10px;
+    border-radius: 5px;
 
+}
+#logIn button,#register button{
+    border-radius: 5px;
+
+}
+button:hover{
+    cursor: pointer;
 }
 /*typography */
 body{
